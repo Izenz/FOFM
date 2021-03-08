@@ -8,3 +8,11 @@ FOFM/.vsconfig
 FOFM/Logs/
 
 FOFM/UserSettings/
+
+FOFM/Assembly-CSharp.csproj
+
+FOFM/FOFM.sln
+
+FOFM/.vs/
+
+FOFM/obj/
