@@ -52,7 +52,7 @@ public class PlayerController : MonoBehaviour
 			if (colliders[i].gameObject != gameObject)
 			{
 				m_Grounded = true;
-				if (!wasGrounded && m_Rigidbody2D.velocity.y < 0)
+				if (!wasGrounded && m_Rigidbody2D.velocity.y <= 0)
 					OnLandEvent.Invoke();
 			}
 		}
@@ -115,6 +115,7 @@ public class PlayerController : MonoBehaviour
                 if (m_DoubleJumpAvailable)
                 {
 					m_DoubleJumpAvailable = false;
+					m_Rigidbody2D.velocity = Vector3.zero;
 					m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
 				}
             }
@@ -129,9 +130,6 @@ public class PlayerController : MonoBehaviour
 		// Switch the way the player is labelled as facing.
 		m_FacingRight = !m_FacingRight;
 
-		// Multiply the player's x local scale by -1.
-		Vector3 theScale = transform.localScale;
-		theScale.x *= -1;
-		transform.localScale = theScale;
+		transform.Rotate(0f, 180f, 0f);
 	}
 }
