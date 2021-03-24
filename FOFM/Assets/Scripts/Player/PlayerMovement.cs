@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private enum State{
+        Normal,
+        Rolling,
+    }
+
     [SerializeField] PlayerController m_Controller;
     [SerializeField] Animator m_Animator;
     [SerializeField] float m_RunningSpeed = 40f;
     private float m_HorizontalMove = 0f;
     private bool m_Jump = false;
+    private bool m_Roll = false;
 
     private void Update()
     {
@@ -19,24 +25,22 @@ public class PlayerMovement : MonoBehaviour
         {
             m_Jump = true;
             m_Animator.SetBool("isJumping", true);
-            //m_Animator.Play("Player_jumping");
         }
 
-        /*
-        if(m_Controller.m_Grounded && m_HorizontalMove == 0)
+        if (Input.GetKeyDown(KeyCode.Q))
         {
-            m_Animator.Play("Player_idle");
+            if (m_Controller.m_Grounded)
+            {
+                m_Roll = true;
+            }
         }
-        else if(m_Controller.m_Grounded && m_HorizontalMove != 0)
-        {
-            m_Animator.Play("Player_moving");
-        }*/
     }
 
     private void FixedUpdate()
     {
-        m_Controller.Move(m_HorizontalMove * Time.fixedDeltaTime, m_Jump);
+        m_Controller.Move(m_HorizontalMove * Time.fixedDeltaTime, m_Jump, m_Roll);
         m_Jump = false;
+        m_Roll = true;
     }
 
     public void OnLanding()

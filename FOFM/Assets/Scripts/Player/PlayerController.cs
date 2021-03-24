@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
 	}
 
 
-	public void Move(float move, bool jump)
+	public void Move(float move, bool jump, bool roll)
 	{
 		//only control the player if grounded or airControl is turned on
 		if (m_Grounded || m_AirControl)
@@ -119,7 +119,6 @@ public class PlayerController : MonoBehaviour
 					m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
 				}
             }
-			
 		}
 
 	}
