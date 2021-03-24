@@ -16,6 +16,14 @@ public class PlayerController : MonoBehaviour
 	private Rigidbody2D m_Rigidbody2D;
 	private bool m_FacingRight = true;  // For determining which way the player is currently facing.
 	private Vector3 m_Velocity = Vector3.zero;
+	private float m_RollSpeed;
+
+	private enum State
+    {
+		Normal,
+		Rolling,
+    }
+	private State state;
 
 	[Header("Events")]
 	[Space]
@@ -31,6 +39,7 @@ public class PlayerController : MonoBehaviour
 	private void Awake()
 	{
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
+		state = State.Normal;
 
 		if (OnLandEvent == null)
 			OnLandEvent = new UnityEvent();
@@ -41,85 +50,107 @@ public class PlayerController : MonoBehaviour
 
 	private void FixedUpdate()
 	{
-		bool wasGrounded = m_Grounded;
-		m_Grounded = false;
+		switch (state)
+        {
+			case State.Normal:
+				bool wasGrounded = m_Grounded;
+				m_Grounded = false;
 
-		// The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-		// This can be done using layers instead but Sample Assets will not overwrite your project settings.
-		Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
-		for (int i = 0; i < colliders.Length; i++)
-		{
-			if (colliders[i].gameObject != gameObject)
-			{
-				m_Grounded = true;
-				if (!wasGrounded && m_Rigidbody2D.velocity.y <= 0)
-					OnLandEvent.Invoke();
-			}
-		}
+				// The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
+				// This can be done using layers instead but Sample Assets will not overwrite your project settings.
+				Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+				for (int i = 0; i < colliders.Length; i++)
+				{
+					if (colliders[i].gameObject != gameObject)
+					{
+						m_Grounded = true;
+						if (!wasGrounded && m_Rigidbody2D.velocity.y <= 0)
+							OnLandEvent.Invoke();
+					}
+				}
+				break;
+			case State.Rolling:
+				m_Rigidbody2D.velocity = transform.right * m_RollSpeed;
+				break;
+        }
+		
 	}
 
 
 	public void Move(float move, bool jump, bool roll)
 	{
-		//only control the player if grounded or airControl is turned on
-		if (m_Grounded || m_AirControl)
-		{
-			// Move the character by finding the target velocity
-			Vector3 targetVelocity = new Vector2(move * 10f, m_Rigidbody2D.velocity.y);
-			// And then smoothing it out and applying it to the character
-			m_Rigidbody2D.velocity = Vector3.SmoothDamp(m_Rigidbody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
-
-			// If the input is moving the player right and the player is facing left...
-			if (move > 0 && !m_FacingRight)
-			{
-				// ... flip the player.
-				Flip();
-			}
-			// Otherwise if the input is moving the player left and the player is facing right...
-			else if (move < 0 && m_FacingRight)
-			{
-				// ... flip the player.
-				Flip();
-			}
-		}
-        /* 
-		 * 
-		// If the player should jump...
-		if (m_Grounded && jump)
-		{
-			// Add a vertical force to the player.
-			m_Grounded = false;
-			m_DoubleJumpAvailable = true;
-			m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
-		}
-		*
-		*/
-
-        // If the player should jump...
-        if (m_Grounded)
+        switch (state)
         {
-			m_DoubleJumpAvailable = true;
+			case State.Normal:
+
+				//only control the player if grounded or airControl is turned on
+				if (m_Grounded || m_AirControl)
+				{
+					// Move the character by finding the target velocity
+					Vector3 targetVelocity = new Vector2(move * 10f, m_Rigidbody2D.velocity.y);
+					// And then smoothing it out and applying it to the character
+					m_Rigidbody2D.velocity = Vector3.SmoothDamp(m_Rigidbody2D.velocity, targetVelocity, ref m_Velocity, m_MovementSmoothing);
+
+					// If the input is moving the player right and the player is facing left...
+					if (move > 0 && !m_FacingRight)
+					{
+						// ... flip the player.
+						Flip();
+					}
+					// Otherwise if the input is moving the player left and the player is facing right...
+					else if (move < 0 && m_FacingRight)
+					{
+						// ... flip the player.
+						Flip();
+					}
+				}
+
+				// If the player should jump...
+				if (m_Grounded)
+				{
+					m_DoubleJumpAvailable = true;
+				}
+
+				if (jump)
+				{
+					if (m_Grounded)
+					{
+						// Add a vertical force to the player.
+						m_Grounded = false;
+						m_DoubleJumpAvailable = true;
+						m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+					}
+					else
+					{
+						if (m_DoubleJumpAvailable)
+						{
+							m_DoubleJumpAvailable = false;
+							m_Rigidbody2D.velocity = Vector3.zero;
+							m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
+						}
+					}
+				}
+
+                if (roll)
+                {
+					m_RollSpeed = 25f;
+					state = State.Rolling;
+                }
+
+				break;
+			case State.Rolling:
+
+				m_RollSpeed -= m_RollSpeed * 5f * Time.deltaTime;
+
+				if(m_RollSpeed < 5f)
+                {
+					state = State.Normal;
+                }
+
+				break;
+
         }
 
-		if (jump)
-		{
-            if (m_Grounded)
-            {
-				// Add a vertical force to the player.
-				m_Grounded = false;
-				m_DoubleJumpAvailable = true;
-				m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
-            }
-            else
-            {
-                if (m_DoubleJumpAvailable)
-                {
-					m_DoubleJumpAvailable = false;
-					m_Rigidbody2D.velocity = Vector3.zero;
-					m_Rigidbody2D.AddForce(new Vector2(0f, m_JumpForce));
-				}
-            }
-		}
 
 	}
 

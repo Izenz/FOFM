@@ -16,6 +16,7 @@ public class PlayerMovement : MonoBehaviour
     private bool m_Jump = false;
     private bool m_Roll = false;
 
+
     private void Update()
     {
         m_HorizontalMove = Input.GetAxisRaw("Horizontal") * m_RunningSpeed;
@@ -32,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
             if (m_Controller.m_Grounded)
             {
                 m_Roll = true;
+                m_Animator.SetTrigger("isRolling");
             }
         }
     }
@@ -40,7 +42,7 @@ public class PlayerMovement : MonoBehaviour
     {
         m_Controller.Move(m_HorizontalMove * Time.fixedDeltaTime, m_Jump, m_Roll);
         m_Jump = false;
-        m_Roll = true;
+        m_Roll = false;
     }
 
     public void OnLanding()
