@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 using UnityEngine;
 
 public class ButtonUtils : MonoBehaviour
@@ -15,16 +16,19 @@ public class ButtonUtils : MonoBehaviour
 
     public void PlayHoverFx()
     {
-        src.PlayOneShot(hoverSound);
+        if(this.GetComponent<Button>().interactable == true)
+            src.PlayOneShot(hoverSound);
     }
 
     public void PlayClickFx()
     {
-        src.PlayOneShot(clickSound);
+        if (this.GetComponent<Button>().interactable == true)
+            src.PlayOneShot(clickSound);
     }
 
     public void ChangeTextColor(Color newColor)
     {
-        this.GetComponentInChildren<TMPro.TMP_Text>().color = newColor;
+        if (this.GetComponent<Button>().interactable == true)
+            this.GetComponentInChildren<TMPro.TMP_Text>().color = newColor;
     }
 }

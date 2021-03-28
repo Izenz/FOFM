@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PauseMenu : MonoBehaviour
 {
     public static bool m_GameIsPaused = false;
     [SerializeField] GameObject m_PauseUI;
+    [SerializeField] GameObject m_PauseSettingsUI;
+
+    const int MENU_SCENE_INDEX = 0;
 
     void Update()
     {
@@ -25,6 +29,7 @@ public class PauseMenu : MonoBehaviour
     public void Resume()
     {
         m_PauseUI.SetActive(false);
+        m_PauseSettingsUI.SetActive(false);
         Time.timeScale = 1f;
         m_GameIsPaused = false;
     }
@@ -35,4 +40,11 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 0f;
         m_GameIsPaused = true;
     }
+
+    public void QuitGame()
+    {
+        Resume();
+        SceneManager.LoadScene(MENU_SCENE_INDEX);
+    }
+
 }
