@@ -6,8 +6,26 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] GameObject m_Player;
+    public GameObject m_Player;
     [SerializeField] Button m_LoadButton;
+
+    private static GameManager g_GameManager;
+    public static GameManager Instance
+    {
+        get
+        {
+            if (!g_GameManager)
+            {
+                g_GameManager = FindObjectOfType(typeof(GameManager)) as GameManager;
+
+                if (!g_GameManager)
+                {
+                    Debug.LogError("There needs to be one active GameManager script on a GameObject in your scene.");
+                }
+            }
+            return g_GameManager;
+        }
+    }
 
     private void Start()
     {

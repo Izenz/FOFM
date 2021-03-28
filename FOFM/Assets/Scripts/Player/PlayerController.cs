@@ -38,6 +38,11 @@ public class PlayerController : MonoBehaviour
 
 	private void Awake()
 	{
+		if(GameManager.Instance != null)
+        {
+			GameManager.Instance.m_Player = gameObject;
+        }
+
 		m_Rigidbody2D = GetComponent<Rigidbody2D>();
 		state = State.Normal;
 
@@ -56,9 +61,9 @@ public class PlayerController : MonoBehaviour
 				bool wasGrounded = m_Grounded;
 				m_Grounded = false;
 
-				// The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
-				// This can be done using layers instead but Sample Assets will not overwrite your project settings.
-				Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
+                // The player is grounded if a circlecast to the groundcheck position hits anything designated as ground
+                // This can be done using layers instead but Sample Assets will not overwrite your project settings.
+                /*Collider2D[] colliders = Physics2D.OverlapCircleAll(m_GroundCheck.position, k_GroundedRadius, m_WhatIsGround);
 				for (int i = 0; i < colliders.Length; i++)
 				{
 					if (colliders[i].gameObject != gameObject)
@@ -67,6 +72,12 @@ public class PlayerController : MonoBehaviour
 						if (!wasGrounded && m_Rigidbody2D.velocity.y <= 0)
 							OnLandEvent.Invoke();
 					}
+				}*/
+                if (Physics2D.OverlapBox(m_GroundCheck.position, GetComponent<BoxCollider2D>().bounds.extents, 0f, m_WhatIsGround))
+                {
+					m_Grounded = true;
+					if (!wasGrounded)
+						OnLandEvent.Invoke();
 				}
 				break;
 			case State.Rolling:
@@ -162,4 +173,10 @@ public class PlayerController : MonoBehaviour
 
 		transform.Rotate(0f, 180f, 0f);
 	}
+
+    public void OnDrawGizmosSelected()
+    {
+		Gizmos.color = Color.red;
+		Gizmos.DrawCube(m_GroundCheck.position, GetComponent<BoxCollider2D>().bounds.extents*2);
+    }
 }
