@@ -19,6 +19,7 @@ public class ParallaxEffect : MonoBehaviour
     {
         float temp = (m_Cam.transform.position.x * (1 - m_ParallaxEffect));
         float distance = (m_Cam.transform.position.x * m_ParallaxEffect);
+
         if(m_FollowVertical)
             transform.position = new Vector3(m_StartPos + distance, transform.position.y, transform.position.z);
         else

@@ -9,7 +9,7 @@ public class PauseMenu : MonoBehaviour
     [SerializeField] GameObject m_PauseUI;
     [SerializeField] GameObject m_PauseSettingsUI;
 
-    const int MENU_SCENE_INDEX = 0;
+    const int k_MainMenuSceneIndex = 0;
 
     void Update()
     {
@@ -44,7 +44,7 @@ public class PauseMenu : MonoBehaviour
     public void QuitGame()
     {
         Resume();
-        SceneManager.LoadScene(MENU_SCENE_INDEX);
+        SceneManager.LoadScene(k_MainMenuSceneIndex);
     }
 
 }
