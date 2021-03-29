@@ -7,7 +7,6 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public GameObject m_Player;
-    public static bool g_InputLock = false;
     [SerializeField] Button m_LoadButton;
 
     private static GameManager g_GameManager;

@@ -22,13 +22,13 @@ public class PlayerMovement : MonoBehaviour
         m_HorizontalMove = Input.GetAxisRaw("Horizontal") * m_RunningSpeed;
         m_Animator.SetFloat("Speed", Mathf.Abs(m_HorizontalMove));
 
-        if (Input.GetButtonDown("Jump") && !GameManager.g_InputLock)
+        if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Space))
         {
             m_Jump = true;
             m_Animator.SetBool("isJumping", true);
         }
 
-        if (Input.GetKeyDown(KeyCode.Q) && !GameManager.g_InputLock)
+        if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Q))
         {
             if (m_Controller.m_Grounded)
             {
@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!GameManager.g_InputLock)
+        if (!InputManager.Instance.IsInputLocked())
         {
             m_Controller.Move(m_HorizontalMove * Time.fixedDeltaTime, m_Jump, m_Roll);
         }

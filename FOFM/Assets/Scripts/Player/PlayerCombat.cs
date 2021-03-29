@@ -15,7 +15,7 @@ public class PlayerCombat : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(1) && !GameManager.g_InputLock)
+        if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Mouse1))
         {
             // 
             if (m_ArrowAvailable && m_Controller.m_Grounded)
@@ -23,7 +23,7 @@ public class PlayerCombat : MonoBehaviour
                 m_ArrowAvailable = false;
                 m_Animator.SetTrigger("ShootArrow");
                 m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
-                GameManager.g_InputLock = true;
+                InputManager.Instance.LockInput();
             }
             else if (!m_Controller.m_Grounded && m_MidAirShotAvailable)
             {
@@ -34,7 +34,7 @@ public class PlayerCombat : MonoBehaviour
                 m_Animator.SetBool("isJumping", false);
                 m_Animator.SetTrigger("ShootArrow");
                 m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
-                GameManager.g_InputLock = true;
+                InputManager.Instance.LockInput();
             }
 
             
@@ -48,8 +48,8 @@ public class PlayerCombat : MonoBehaviour
         Physics2D.IgnoreCollision(bullet.GetComponent<BoxCollider2D>(), GetComponent<CircleCollider2D>());
         m_ArrowAvailable = true;
         m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
-        GameManager.g_InputLock = false;
-        
+        InputManager.Instance.UnlockInput();
+
         if (m_WasJumping)
         {
             m_Animator.SetBool("isJumping", true);
