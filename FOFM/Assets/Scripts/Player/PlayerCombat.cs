@@ -10,18 +10,34 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] Transform m_ArrowSpawn;
     [SerializeField] GameObject m_ArrowPrefab;
     private bool m_ArrowAvailable = true;
+    private bool m_MidAirShotAvailable = true;
+    private bool m_WasJumping = false;
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && !GameManager.g_InputLock)
         {
+            // 
             if (m_ArrowAvailable && m_Controller.m_Grounded)
             {
                 m_ArrowAvailable = false;
                 m_Animator.SetTrigger("ShootArrow");
-                m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation; 
+                m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+                GameManager.g_InputLock = true;
+            }
+            else if (!m_Controller.m_Grounded && m_MidAirShotAvailable)
+            {
+                m_MidAirShotAvailable = false;
+                m_WasJumping = true;
+
+
+                m_Animator.SetBool("isJumping", false);
+                m_Animator.SetTrigger("ShootArrow");
+                m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+                GameManager.g_InputLock = true;
             }
 
+            
         }
     }
 
@@ -32,5 +48,17 @@ public class PlayerCombat : MonoBehaviour
         Physics2D.IgnoreCollision(bullet.GetComponent<BoxCollider2D>(), GetComponent<CircleCollider2D>());
         m_ArrowAvailable = true;
         m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+        GameManager.g_InputLock = false;
+        
+        if (m_WasJumping)
+        {
+            m_Animator.SetBool("isJumping", true);
+            m_WasJumping = false;
+        }
+    }
+
+    public void ActivateMidAirShot()
+    {
+        m_MidAirShotAvailable = true;
     }
 }
