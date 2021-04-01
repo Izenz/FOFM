@@ -12,12 +12,18 @@ public class PlayerCombat : MonoBehaviour
     private bool m_ArrowAvailable = true;
     private bool m_MidAirShotAvailable = true;
     private bool m_WasJumping = false;
+    private bool m_CanFollowUp;
+    private bool m_IsAttacking = false;
 
+    private void Start()
+    {
+        m_Animator.SetLayerWeight(0, 0);
+    }
     void Update()
     {
         if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Mouse1))
         {
-            // 
+            
             if (m_ArrowAvailable && m_Controller.m_Grounded)
             {
                 m_ArrowAvailable = false;
@@ -36,8 +42,12 @@ public class PlayerCombat : MonoBehaviour
                 m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
                 InputManager.Instance.LockInput();
             }
+        }
 
-            
+        if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Mouse0) && m_Controller.m_Grounded && !m_IsAttacking)
+        {
+            m_IsAttacking = true;
+            m_Animator.SetBool("isAttacking", true);
         }
     }
 
@@ -46,7 +56,8 @@ public class PlayerCombat : MonoBehaviour
         GameObject bullet = Instantiate(m_ArrowPrefab, m_ArrowSpawn.position, m_ArrowSpawn.rotation);
         Physics2D.IgnoreCollision(bullet.GetComponent<BoxCollider2D>(), GetComponent<BoxCollider2D>());
         Physics2D.IgnoreCollision(bullet.GetComponent<BoxCollider2D>(), GetComponent<CircleCollider2D>());
-        m_ArrowAvailable = true;
+
+        
         m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
         InputManager.Instance.UnlockInput();
 
@@ -55,10 +66,48 @@ public class PlayerCombat : MonoBehaviour
             m_Animator.SetBool("isJumping", true);
             m_WasJumping = false;
         }
+
+        m_ArrowAvailable = true;
     }
 
     public void ActivateMidAirShot()
     {
         m_MidAirShotAvailable = true;
+    }
+
+    public void MeleeAttackBegin(float timer)
+    {
+        StartCoroutine(IFollowUpAttack(timer));
+    }
+
+    public void MeleeAttackEnd()
+    {
+        StopCoroutine(IFollowUpAttack(0));
+
+        m_Animator.ResetTrigger("Attack");
+        m_Animator.SetBool("isAttacking", false);
+
+        m_CanFollowUp = false;
+        m_IsAttacking = false;
+    }
+
+    IEnumerator IFollowUpAttack(float timer)
+    {
+        m_CanFollowUp = false;
+        yield return new WaitForSeconds(timer);
+        m_CanFollowUp = true;
+
+        while (m_CanFollowUp)
+        {
+            if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Mouse0))
+            {
+                m_CanFollowUp = false;
+                m_Animator.ResetTrigger("Attack");
+                m_Animator.SetTrigger("Attack");
+                StopCoroutine(IFollowUpAttack(0));
+            }
+            yield return null;
+        }
+
     }
 }
