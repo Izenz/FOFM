@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Space))
         {
+            m_Animator.SetBool("isAttacking", false);
             m_Jump = true;
             m_Animator.SetBool("isJumping", true);
         }
@@ -32,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (m_Controller.m_Grounded)
             {
+                m_Animator.SetBool("isAttacking", false);
                 m_Roll = true;
                 m_Animator.SetTrigger("isRolling");
             }

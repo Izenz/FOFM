@@ -13,12 +13,7 @@ public class PlayerCombat : MonoBehaviour
     private bool m_MidAirShotAvailable = true;
     private bool m_WasJumping = false;
     private bool m_CanFollowUp;
-    private bool m_IsAttacking = false;
 
-    private void Start()
-    {
-        m_Animator.SetLayerWeight(0, 0);
-    }
     void Update()
     {
         if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Mouse1))
@@ -44,9 +39,8 @@ public class PlayerCombat : MonoBehaviour
             }
         }
 
-        if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Mouse0) && m_Controller.m_Grounded && !m_IsAttacking)
+        if (InputManager.Instance.GetButtonPress(InputManager.Buttons.Mouse0) && m_Controller.m_Grounded && !m_Animator.GetBool("isAttacking"))
         {
-            m_IsAttacking = true;
             m_Animator.SetBool("isAttacking", true);
         }
     }
@@ -88,13 +82,19 @@ public class PlayerCombat : MonoBehaviour
         m_Animator.SetBool("isAttacking", false);
 
         m_CanFollowUp = false;
-        m_IsAttacking = false;
     }
 
     IEnumerator IFollowUpAttack(float timer)
     {
+        //Animation lock
         m_CanFollowUp = false;
+        InputManager.Instance.LockInput();
+        m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
         yield return new WaitForSeconds(timer);
+
+
+        InputManager.Instance.UnlockInput();
+        m_Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
         m_CanFollowUp = true;
 
         while (m_CanFollowUp)
