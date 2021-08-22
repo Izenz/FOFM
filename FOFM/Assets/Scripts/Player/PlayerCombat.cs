@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class PlayerCombat : MonoBehaviour
 {
@@ -9,10 +10,18 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] Rigidbody2D m_Rigidbody2D;
     [SerializeField] Transform m_ArrowSpawn;
     [SerializeField] GameObject m_ArrowPrefab;
+    private StatusComponent m_StatusComp; 
+
     private bool m_ArrowAvailable = true;
     private bool m_MidAirShotAvailable = true;
     private bool m_WasJumping = false;
     private bool m_CanFollowUp;
+
+    private void Awake()
+    {
+        m_StatusComp = GetComponent<StatusComponent>();
+        m_StatusComp.OnDeath += Die;
+    }
 
     void Update()
     {
@@ -108,6 +117,13 @@ public class PlayerCombat : MonoBehaviour
             }
             yield return null;
         }
+    }
 
+    private void Die()
+    {
+        InputManager.Instance.LockInput();
+        // Show Death menu
+        m_Animator.SetBool("isDead", true);
+        Debug.Log("Jugador ha muerto");
     }
 }

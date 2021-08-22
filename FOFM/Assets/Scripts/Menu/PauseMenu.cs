@@ -8,6 +8,7 @@ public class PauseMenu : MonoBehaviour
     public static bool m_GameIsPaused = false;
     [SerializeField] GameObject m_PauseUI;
     [SerializeField] GameObject m_PauseSettingsUI;
+    [SerializeField] Animator m_MenuAnimator;
 
     const int k_MainMenuSceneIndex = 0;
 
@@ -37,6 +38,7 @@ public class PauseMenu : MonoBehaviour
     void Pause()
     {
         m_PauseUI.SetActive(true);
+        m_MenuAnimator.SetTrigger("FadeIn");
         Time.timeScale = 0f;
         m_GameIsPaused = true;
     }
@@ -44,6 +46,7 @@ public class PauseMenu : MonoBehaviour
     public void QuitGame()
     {
         Resume();
+        Destroy(GameManager.Instance.gameObject);
         SceneManager.LoadScene(k_MainMenuSceneIndex);
     }
 

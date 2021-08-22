@@ -6,7 +6,6 @@ public class ChasingState : State
 {
     private Rigidbody2D m_EnemyRB;
     private float m_MovSpeed;
-    private float m_MovementSmoothing = 0.05f;
     public override void OnStart()
     {
         InAttackRange startAttacking =  new InAttackRange();

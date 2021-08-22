@@ -22,15 +22,15 @@ public class SettingsMenu : MonoBehaviour
     const float DEFAULT_GLOBAL_VOLUME = 0f;
     const float DEFAULT_SUB_VOLUME = -40f;
 
-    void Awake()
+    void Start()
     {
-        PlayerPrefs.GetFloat("masterVolume", DEFAULT_GLOBAL_VOLUME);
+        SetMasterVolume(PlayerPrefs.GetFloat("masterVolume", DEFAULT_GLOBAL_VOLUME));
         generalSlider.value = PlayerPrefs.GetFloat("masterVolume", DEFAULT_GLOBAL_VOLUME);
-        PlayerPrefs.GetFloat("effectsVolume", DEFAULT_SUB_VOLUME);
+        SetEffectsVolume(PlayerPrefs.GetFloat("effectsVolume", DEFAULT_SUB_VOLUME));
         ambientSlider.value = PlayerPrefs.GetFloat("ambientVolume", DEFAULT_SUB_VOLUME);
-        PlayerPrefs.GetFloat("ambientVolume", DEFAULT_SUB_VOLUME);
+        SetAmbientVolume(PlayerPrefs.GetFloat("ambientVolume", DEFAULT_SUB_VOLUME));
         effectsSlider.value = PlayerPrefs.GetFloat("effectsVolume", DEFAULT_SUB_VOLUME);
-        PlayerPrefs.GetFloat("backgroundVolume", DEFAULT_SUB_VOLUME);
+        SetBackgroundVolume(PlayerPrefs.GetFloat("backgroundVolume", DEFAULT_SUB_VOLUME));
         backgroundSlider.value = PlayerPrefs.GetFloat("backgroundVolume", DEFAULT_SUB_VOLUME);
 
         LoadResolutionDropdown();
@@ -65,7 +65,7 @@ public class SettingsMenu : MonoBehaviour
         resolutionDropdown.RefreshShownValue();
     }
 
-    public void SetMasterVolume( float volume)
+    public void SetMasterVolume(float volume)
     {
         audioMixer.SetFloat("masterVolume", volume);
         PlayerPrefs.SetFloat("masterVolume", volume);
